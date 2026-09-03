@@ -2,6 +2,8 @@
 
 Mr Pocket is a personal finance dashboard for tracking money in, money out, savings goals, recurring reminders, and shared expenses. It provides a focused view of your financial activity and lets you export transaction data in several formats.
 
+**Live Demo:** [mrpocket00.vercel.app](https://mrpocket00.vercel.app/)
+
 ## Features
 
 - Secure email/password authentication with Supabase Auth
@@ -87,10 +89,10 @@ In Supabase Dashboard > Authentication > URL Configuration, add both local and d
 
 ```text
 http://localhost:3000/**
-https://your-production-domain.com/**
+https://mrpocket00.vercel.app/**
 ```
 
-Set the Site URL to the primary deployed URL when deploying. OAuth and email confirmation links are generated from the current browser origin, so local development stays on localhost.
+Set the Supabase Site URL to `https://mrpocket00.vercel.app`. OAuth and email confirmation links are generated from the current browser origin, so local development stays on localhost.
 
 ### 6. Start the development server
 
@@ -99,6 +101,27 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## PWA Support
+
+Mr Pocket includes a web app manifest and service worker, so it can be installed from supported browsers as a standalone app. The service worker caches static assets and uses a network-first strategy for page navigation. Authentication, API requests, and Supabase requests are intentionally excluded from caching.
+
+To test installation locally:
+
+1. Start the app with `npm run dev`.
+2. Open `http://localhost:3000` in a browser that supports PWA installation.
+3. Use the browser's install prompt or install option in the address bar.
+
+PWAs require HTTPS in production. `localhost` is treated as a secure development origin by modern browsers.
+
+### Use It On Your Phone
+
+Yes. Open the [live app](https://mrpocket00.vercel.app/) on your phone and install it from your browser:
+
+- **Android:** Open the site in Chrome, tap the three-dot menu, then choose **Install app** or **Add to Home screen**.
+- **iPhone/iPad:** Open the site in Safari, tap **Share**, choose **Add to Home Screen**, and confirm.
+
+After installation, Mr Pocket opens in a standalone app-like window with its own Home Screen icon. It is still a web app, so sign-in and live financial data require an internet connection. The installed app uses the same Supabase account as the browser version.
 
 ## Available Scripts
 
@@ -161,7 +184,7 @@ vercel.json           Vercel build and deployment configuration
 2. Import the repository into [Vercel](https://vercel.com/).
 3. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` under Project Settings > Environment Variables.
 4. Deploy using the default Next.js settings.
-5. Add the deployed URL to Supabase Authentication > URL Configuration.
+5. Add `https://mrpocket00.vercel.app/**` to Supabase Authentication > URL Configuration and set it as the Site URL.
 6. Test email confirmation, password reset, Google sign-in, and protected routes in the deployed environment.
 
 The included `vercel.json` uses the following commands:

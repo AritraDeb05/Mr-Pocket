@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -15,10 +16,19 @@ export const metadata = {
   },
 };
 
+export const viewport = {
+  themeColor: '#4f46e5',
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="font-sans bg-ink-50 text-ink-900">{children}</body>
+      <body className="font-sans bg-ink-50 text-ink-900">
+        <ServiceWorkerRegistration />
+        {children}
+      </body>
     </html>
   );
 }
