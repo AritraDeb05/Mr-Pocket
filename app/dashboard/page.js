@@ -81,7 +81,7 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <Nav />
       <div className="max-w-5xl mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between" data-tour="balance">
           <h1 className="text-2xl font-bold text-ink-900">Dashboard</h1>
           <div className="flex items-center gap-3 bg-white rounded-xl2 shadow-card px-4 py-2.5">
             <span className="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center flex-shrink-0">
@@ -96,13 +96,15 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <PeriodSelector
-          periodType={periodType}
-          referenceDate={referenceDate}
-          label={label}
-          onPeriodTypeChange={setPeriodType}
-          onReferenceDateChange={setReferenceDate}
-        />
+        <div data-tour="period">
+          <PeriodSelector
+            periodType={periodType}
+            referenceDate={referenceDate}
+            label={label}
+            onPeriodTypeChange={setPeriodType}
+            onReferenceDateChange={setReferenceDate}
+          />
+        </div>
 
         {loading ? (
           <div className="text-ink-400 p-8 text-center">Loading…</div>

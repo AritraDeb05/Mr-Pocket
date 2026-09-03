@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { LayoutDashboard, Receipt, Target, BellRing, Users, Download, User, LogOut, Menu, X } from 'lucide-react';
+import OnboardingTour from './OnboardingTour';
 
 const LINKS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -49,7 +50,7 @@ export default function Nav() {
                 ? 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors bg-brand-50 text-brand-700'
                 : 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors text-ink-500 hover:text-ink-900 hover:bg-ink-50';
               return (
-                <a key={link.href} href={link.href} className={classes}>
+                <a key={link.href} href={link.href} data-tour={link.href === '/transactions' ? 'transactions' : link.href === '/goals' ? 'goals' : link.href === '/groups' ? 'groups' : link.href === '/profile' ? 'profile' : undefined} className={classes}>
                   <link.icon size={16} />
                   <span className="hidden lg:inline">{link.label}</span>
                 </a>
@@ -81,6 +82,7 @@ export default function Nav() {
           </div>
         </div>
       </nav>
+      <OnboardingTour canOpen={pathname === '/dashboard'} />
 
       {/* Mobile slide-in menu */}
       {menuOpen && (
