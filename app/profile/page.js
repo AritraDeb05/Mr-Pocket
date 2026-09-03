@@ -18,6 +18,8 @@ export default function ProfilePage() {
   const [step, setStep] = useState('idle');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
 
   const [minBalance, setMinBalance] = useState('');
   const [savingBalance, setSavingBalance] = useState(false);
@@ -81,7 +83,9 @@ export default function ProfilePage() {
   async function sendOtp() {
     setErr('');
     setMsg('');
+    setSendingOtp(true);
     const { error } = await supabase.auth.reauthenticate();
+    setSendingOtp(false);
     if (error) {
       setErr(error.message);
     } else {
@@ -93,18 +97,20 @@ export default function ProfilePage() {
   async function verifyOtpAndSetPassword(e) {
     e.preventDefault();
     setErr('');
+    setMsg('');
+    setVerifyingOtp(true);
 
-    const { error: otpError } = await supabase.auth.verifyOtp({
-      email: user.email,
-      token: otp,
-      type: 'reauthentication',
+    const token = otp.trim();
+
+    // Supabase reauthenticate() sends an OTP that acts as a reauthentication nonce.
+    // It must be passed directly to updateUser({ password, nonce }) rather than verifyOtp().
+    const { error: pwError } = await supabase.auth.updateUser({
+      password: newPassword,
+      nonce: token,
     });
-    if (otpError) {
-      setErr(otpError.message);
-      return;
-    }
 
-    const { error: pwError } = await supabase.auth.updateUser({ password: newPassword });
+    setVerifyingOtp(false);
+
     if (pwError) {
       setErr(pwError.message);
       return;
@@ -112,6 +118,8 @@ export default function ProfilePage() {
 
     setStep('done');
     setMsg('Password Added. You Can Now Log In With Email + Password Too.');
+    setOtp('');
+    setNewPassword('');
     load();
   }
 
@@ -335,17 +343,18 @@ export default function ProfilePage() {
           {!hasPassword && step === 'idle' && (
             <button
               onClick={sendOtp}
-              className="w-full flex items-center justify-center gap-2 border border-ink-200 rounded-lg py-2.5 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors"
+              disabled={sendingOtp}
+              className="w-full flex items-center justify-center gap-2 border border-ink-200 rounded-lg py-2.5 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors disabled:opacity-50"
             >
               <KeyRound size={16} />
-              Add A Password (Verify Via Email OTP)
+              {sendingOtp ? 'Sending Code…' : 'Add A Password (Verify Via Email OTP)'}
             </button>
           )}
 
           {!hasPassword && step === 'otp-sent' && (
             <form onSubmit={verifyOtpAndSetPassword} className="space-y-3 pt-2 border-t border-ink-100">
               <input
-                placeholder="6-Digit Code From Email"
+                placeholder="Code From Email"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 className="w-full border border-ink-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
@@ -353,7 +362,7 @@ export default function ProfilePage() {
               />
               <input
                 type="password"
-                placeholder="New Password"
+                placeholder="New Password (Min 6 Characters)"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="w-full border border-ink-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
@@ -362,10 +371,34 @@ export default function ProfilePage() {
               />
               <button
                 type="submit"
-                className="w-full bg-brand-600 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-brand-700 transition-colors"
+                disabled={verifyingOtp}
+                className="w-full bg-brand-600 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-brand-700 transition-colors disabled:opacity-50"
               >
-                Verify & Set Password
+                {verifyingOtp ? 'Verifying…' : 'Verify & Set Password'}
               </button>
+              <div className="flex justify-between items-center pt-1 text-xs">
+                <button
+                  type="button"
+                  onClick={sendOtp}
+                  disabled={sendingOtp}
+                  className="text-brand-600 hover:underline font-medium disabled:opacity-50"
+                >
+                  {sendingOtp ? 'Resending…' : 'Resend Code'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('idle');
+                    setErr('');
+                    setMsg('');
+                    setOtp('');
+                    setNewPassword('');
+                  }}
+                  className="text-ink-400 hover:text-ink-600"
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           )}
         </div>
