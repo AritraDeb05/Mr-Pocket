@@ -82,11 +82,11 @@ export default function Nav() {
           </div>
         </div>
       </nav>
-      <OnboardingTour canOpen={pathname === '/dashboard'} />
+      <OnboardingTour canOpen={pathname === '/dashboard'} onMobileMenuChange={setMenuOpen} />
 
       {/* Mobile slide-in menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-30 md:hidden">
+        <div className="fixed inset-0 z-[60] md:hidden">
           <div className="absolute inset-0 bg-black/30" onClick={closeMenu} />
           <div className="absolute top-0 left-0 h-full w-72 bg-white shadow-xl p-4 space-y-1">
             <div className="flex items-center justify-between mb-4">
@@ -105,7 +105,13 @@ export default function Nav() {
                 ? 'flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium bg-brand-50 text-brand-700'
                 : 'flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-ink-600 hover:bg-ink-50';
               return (
-                <a key={link.href} href={link.href} onClick={closeMenu} className={classes}>
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMenu}
+                  data-tour={link.href === '/transactions' ? 'transactions' : link.href === '/goals' ? 'goals' : link.href === '/groups' ? 'groups' : link.href === '/profile' ? 'profile' : undefined}
+                  className={classes}
+                >
                   <link.icon size={18} />
                   {link.label}
                 </a>

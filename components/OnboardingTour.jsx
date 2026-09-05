@@ -44,7 +44,7 @@ function finishTour(setOpen, completeKey) {
   setOpen(false);
 }
 
-export default function OnboardingTour({ canOpen = false }) {
+export default function OnboardingTour({ canOpen = false, onMobileMenuChange }) {
   const [open, setOpen] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [position, setPosition] = useState(null);
@@ -93,13 +93,26 @@ export default function OnboardingTour({ canOpen = false }) {
     }
 
     updatePosition();
+    const frame = window.requestAnimationFrame(updatePosition);
     window.addEventListener('resize', updatePosition);
     window.addEventListener('scroll', updatePosition, true);
     return () => {
+      window.cancelAnimationFrame(frame);
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition, true);
     };
   }, [open, stepIndex]);
+
+  useEffect(() => {
+    if (!open || !onMobileMenuChange) return;
+
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    onMobileMenuChange(isMobile && stepIndex >= 2);
+
+    return () => {
+      onMobileMenuChange(false);
+    };
+  }, [open, stepIndex, onMobileMenuChange]);
 
   if (!open || !canOpen) return null;
 
@@ -107,7 +120,7 @@ export default function OnboardingTour({ canOpen = false }) {
   const isLastStep = stepIndex === STEPS.length - 1;
 
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="tour-title">
+    <div className="fixed inset-0 z-[70]" role="dialog" aria-modal="true" aria-labelledby="tour-title">
       <div className="absolute inset-0 bg-ink-950/55" />
       {position && (
         <div
@@ -115,7 +128,7 @@ export default function OnboardingTour({ canOpen = false }) {
           style={position}
         />
       )}
-      <div className="absolute left-1/2 top-1/2 w-[min(calc(100%-2rem),24rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl2 bg-white p-6 shadow-2xl sm:p-7">
+      <div className="absolute left-1/2 top-1/2 z-[70] w-[min(calc(100%-2rem),24rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl2 bg-white p-6 shadow-2xl sm:p-7">
         <div className="mb-5 flex items-center justify-between">
           <p className="text-xs font-semibold uppercase tracking-widest text-brand-600">
             Welcome to Mr Pocket
